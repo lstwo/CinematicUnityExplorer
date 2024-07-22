@@ -127,37 +127,8 @@ namespace UnityExplorer.UI.Panels
 
         static void SetupFreeCamera()
         {
-            if (useGameCameraToggle.isOn)
-            {
-                if (!lastMainCamera)
-                {
-                    ExplorerCore.LogWarning($"There is no previous Camera found, reverting to default Free Cam.");
-                    useGameCameraToggle.isOn = false;
-                }
-                else
-                {
-                    usingGameCamera = true;
-                    ourCamera = lastMainCamera;
-                    MaybeToggleCinemachine(false);
-
-                    // If the farClipPlaneValue is the default one try to use the one from the gameplay camera
-                    if (farClipPlaneValue == 2000){
-                        farClipPlaneValue = ourCamera.farClipPlane;
-                        farClipPlaneInput.Text = farClipPlaneValue.ToString();
-                        // Let the default farClipPlane value exceed the slider max value
-                        if (farClipPlaneValue <= farClipPlaneSlider.maxValue)
-                            farClipPlaneSlider.value = farClipPlaneValue;
-                    }
-                }
-            }
-
-            if (!useGameCameraToggle.isOn)
-            {
-                usingGameCamera = false;
-
-                if (lastMainCamera)
-                    lastMainCamera.enabled = false;
-            }
+            if (lastMainCamera && !useGameCameraToggle.isOn)
+                lastMainCamera.enabled = false;
 
             if (!ourCamera)
             {
@@ -297,7 +268,7 @@ namespace UnityExplorer.UI.Panels
             UIFactory.SetLayoutElement(toggleObj, minHeight: 25, flexibleWidth: 9999);
             useGameCameraToggle.onValueChanged.AddListener(OnUseGameCameraToggled);
             useGameCameraToggle.isOn = ConfigManager.Default_Gameplay_Freecam.Value;
-            useGameCameraText.text = "Use Game Camera?";
+            useGameCameraText.text = "Enable Game Camera?";
 
             AddSpacer(5);
 
@@ -525,7 +496,6 @@ namespace UnityExplorer.UI.Panels
 
         void OnUseGameCameraToggled(bool value)
         {
-            // TODO: Change the value on ConfigManager.Default_Gameplay_Freecam and save it
             EventSystemHelper.SetSelectedGameObject(null);
 
             if (!inFreeCamMode)
